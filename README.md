@@ -8,7 +8,7 @@ First, this guide require the use of Aerolab. You can find the tool here: https:
 
 Download the relevant release from there: https://github.com/aerospike/aerolab/releases
 
-The repository supports only [AWS EC2 instances](#AWS) or [Docker](#Docker).
+The repository supports only [AWS EC2 instances](#working-with-aws-aws) or [Docker](#working-with-aws-Docker).
 Depending on what you want, install the Docker CLI https://www.docker.com/ or AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html.
 
 Don't forger to have Docker or the AWS cli configured properly.
@@ -48,11 +48,11 @@ There is no default configuration!
 | CLIENT_NUMBER_OF_NODES | At least 1 to upload the load generator. You can skip this parameter if you plan to develop your own tool to work with the cluster. |
 
 
-#  Working with AWS {#AWS}
+#  Working with AWS
 
 To work with AWS, be sure you set it in the configuration file located in configuration/config.sh
 
-# Working with Docker {#Docker}
+# Working with Docker
 **Important**
 It's better to ensure you can use Docker without sudo to ensure a smooth experience with this guide. Please follow post-installation steps from docker: https://docs.docker.com/engine/install/linux-postinstall/ 
 
