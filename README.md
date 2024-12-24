@@ -8,7 +8,8 @@ First, this guide require the use of Aerolab. You can find the tool here: https:
 
 Download the relevant release from there: https://github.com/aerospike/aerolab/releases
 
-Then, you will also need to use Docker as it'll be the backend for Aerolab. This way, you can manage everything from your laptop/desktop. https://www.docker.com/
+The repository is to be used with AWS EC2 instances or Docker.
+Depending on what you want, install the Docker CLI https://www.docker.com/ or AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html.
 
 
 **Important**
