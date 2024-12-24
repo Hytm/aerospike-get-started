@@ -1,4 +1,5 @@
 #GENERAL
+BACKEND="AWS" # AWS or DOCKER only supported
 DURATION=4
 #Should always be between 1 and the initial size defined with CLUSTER_NUMBER_OF_NODES
 NODE_TO_STOP=3
