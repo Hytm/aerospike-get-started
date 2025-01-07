@@ -2,7 +2,7 @@
 
 This repository is here to help you get started with Aerospike in an efficient and easy manner.
 
-Here is an example of what you can expect when using this repository:
+Here is an example of what you can expect when using this repository (clicking the image will open the Youtube video):
 
 [![Youtube link](https://img.youtube.com/vi/uCIxnQHLRWU/0.jpg)](https://www.youtube.com/watch?v=uCIxnQHLRWU)
 
