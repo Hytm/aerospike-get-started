@@ -8,8 +8,10 @@ First, this guide require the use of Aerolab. You can find the tool here: https:
 
 Download the relevant release from there: https://github.com/aerospike/aerolab/releases
 
-The repository supports only [AWS EC2 instances](#working-with-aws) or [Docker](#working-with-docker).
+The repository supports only [AWS EC2 instances](#working-with-aws) or [Docker](##working-with-docker).
 Depending on what you want, install the Docker CLI https://www.docker.com/ or AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html.
+
+When working with AWS, it is mandatory to have instances with NVME, like m7gd.4xlarge or i3.large for example. The Aerospike configuration will require this to work properly and define the devices in aerospike.conf.
 
 Don't forger to have Docker or the AWS cli configured properly.
 
@@ -24,6 +26,7 @@ There is no default configuration!
 | Parameter | Description |
 | --------- | ----------- |
 | BACKEND | AWS or DOCKER only supported |
+| DESTROY_ON_CREATE | If set to true, aerolab destroy command will be sent before attempting creation |
 | DURATION | Aerolab will automaticlly kill the cluster after this number of hours |
 | NODE_TO_STOP | Should always be between 1 and the initial size defined with CLUSTER_NUMBER_OF_NODES |
 
@@ -48,43 +51,123 @@ There is no default configuration!
 | CLIENT_NUMBER_OF_NODES | At least 1 to upload the load generator. You can skip this parameter if you plan to develop your own tool to work with the cluster. |
 
 
-#  Working with AWS
+##  Working with AWS
 
-To work with AWS, be sure you set it in the configuration file located in configuration/config.sh
+To work with AWS, be sure you set it in the configuration file located in configuration/config.sh the different parameter mandatory for AWS, like instances type (check "Only for AWS" in the configuration parameters description).
 
-# Working with Docker
+Validate you have you AWS CLI properly configured to manage EC2, Subnets, etc. 
+
+This is an example of configuration 
+
+> #### GENERAL
+> BACKEND="AWS"
+> 
+> DESTROY_ON_CREATE="true"
+> 
+> DURATION=12
+> 
+> NODE_TO_STOP=3
+> 
+> #### CLUSTER
+> CLUSTER_NAME="DEMO"
+> 
+> CLUSTER_INSTANCE_TYPE="i4g.4xlarge"
+> 
+> CLUSTER_NUMBER_OF_NODES=5
+> 
+> #### MONITORING
+> GRAFANA_NAME=${CLUSTER_NAME}"_GRAFANA"
+> 
+> GRAFANA_INSTANCE_TYPE="t3.xlarge"
+> 
+> #### CLIENT
+> CLIENT_NAME=${CLUSTER_NAME}"_CLIENT"
+> 
+> CLIENT_INSTANCE_TYPE="c7i.12xlarge"
+> 
+> CLIENT_NUMBER_OF_NODES=1
+
+## Working with Docker
+
 **Important**
 It's better to ensure you can use Docker without sudo to ensure a smooth experience with this guide. Please follow post-installation steps from docker: https://docs.docker.com/engine/install/linux-postinstall/ 
 
-## Cluster and Monitoring setup
+> #### GENERAL
+> BACKEND="DOCKER"
+> 
+> DESTROY_ON_CREATE="true"
+> 
+> DURATION=4
+> 
+> NODE_TO_STOP=3
+> 
+> #### CLUSTER
+> CLUSTER_NAME="DEMO"
+> 
+> CLUSTER_NUMBER_OF_NODES=3
+> 
+> #### MONITORING
+> GRAFANA_NAME=${CLUSTER_NAME}"_GRAFANA"
+> 
+> #### CLIENT
+> CLIENT_NAME=${CLUSTER_NAME}"_CLIENT"
+> 
+> CLIENT_NUMBER_OF_NODES=1
 
-First, configure Aerolab to use docker
-    `aerolab config backend -t docker`
+# Use the scripts
 
-Then you can start a cluster with this command
-`aerolab cluster create -c 5`
+In the script folder, you'll find all the script needed to get up & running!
 
-It'll create a 5 nodes cluster locally.
+| Script Name | Description |
+| --------- | ----------- |
+| 01-start.sh | As expected, this one creates the whole environment |
+| 02-addNodes.sh | This one adds two nodes to the existing cluster |
+| 03-stopNode.sh | Will send a stop command to a node with Aerolab |
+| 04-restartNode.sh | Restart the node stopped by 03-stopNode.sh |
+| 05-clean.sh | Destroy all the environment (cluster, grafana, and client) |
 
-Add the exporter for monitoring
-`aerolab cluster add exporter -n mydc`
+You don't need to follow the numbers, those are not steps. 
 
-And finally the monitoring client
-`aerolab client create ams -s mydc`
+Scripts to add nodes, stop and restart a node, are mostly helpful to help you observe the impact on performance when an issue happens in your cluster. 
 
-You should be now able to access the Grafana console from http://127.0.0.1:3000
+So, you mostly need to start everything and clean your environment, especially when running on AWS to avoid paying too much!
 
-## Testing the installation
+# Cluster and Monitoring setup
 
-In this repo, you can find the get-started binary. You can simply launch it, it should be ok and start inserting and reading data from your Aerospike cluster!
+Once finished, the installation should have prepared a Grafana host to check monitoring.
 
-Here are the parameters you can use:
+In the dashboards section, you can find multiple Aerospike dedicated dashboards. You can also import the one provided in the grafana/dashboard folder. Simply copy the content and paste it in the import box from Grafana.
+
+# Testing the installation
+
+In this repo, you can find the benchme binary in client folder. 
+
+You can simply launch it, it should be ok and start inserting and reading data from your Aerospike cluster!
+After the launch, you'll see the command to run from the client.
+To connect to the client, you need to pass the ssh key used by Aerolab. Here is an example
+
+`ssh -i ~/aerolab-keys/aerolab-DEMO_CLIENT_us-east-2 ubuntu@{Client IP}`
+
+### Parameters for benchme
 | Parameter | Description | Default |
-| ----------- | ----------- | ----------- |
-| -H | One of the node IP | 127.0.0.1 |
-| -p | Port used | 3101 |
-| -d | Duration of the tes in seconds | 60 |
-| -m | Maximum number of records to write | 1000000 |
-| -h | help | |
+| --------- | ----------- | ------- |
+| -H --host-ip | Host IP| 127.0.0.1 |
+| -p --port | Port | 3000 |
+| -w --write-ratio | Percentage of write threads. Other will be read threads | 20 |
+| -c --concurrency | Concurrency defines the number of threads | 2 |
+| -d --duration | Duration in seconds. 0 means unlimited | 0 |
+| -m --max-keys | Maximum number of records. Past this value, you can update or insert/delete records. | 1 000 000 |
+| -r --report-delay | Delay between information printed on screen | 10 |
+| -s --size | Size of records in bytes | 2048 |
+| -u --update | After MAX_KEYS is reached, update record or not | true |
+| -t --truncate | Will truncate the namespace before inserting new keys. | false |
+| -d --docker | If set to true, change the client behavior to ensure you can run on local machine. | false |
+| -h --h | Print help |
+| -V --v | Print version |
 
-It's up to you to change those parameters or to create your own tool. But with that you should be able to check the performance and resilience of Aerospike!
+It's up to you to change parameters or to create your own tool. But with that you should be able to check the performance and resilience of Aerospike!
+
+## Use your own application
+
+It's not mandatory to use the tool provided. This tool is just here to let you observe the performance achievable by Aerospike.
+Feel free to create your own tool and connect to the cluster.
