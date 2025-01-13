@@ -1,5 +1,7 @@
 # get-started-with-aerospike
 
+**Important notice: This is not a repository mantained by Aerospike. This is a best effort to help people experiment with Aerospike.**
+
 This repository is here to help you get started with Aerospike in an efficient and easy manner.
 
 Here is an example of what you can expect when using this repository (clicking the image will open the Youtube video):
