@@ -35,6 +35,7 @@ There is no default configuration!
 | DESTROY_ON_CREATE | If set to true, aerolab destroy command will be sent before attempting creation |
 | DURATION | Aerolab will automaticlly kill the cluster after this number of hours |
 | NODE_TO_STOP | Should always be between 1 and the initial size defined with CLUSTER_NUMBER_OF_NODES |
+| VERSION | If set, it will let you decide which version to use. When you want to explore with a CE version, this is mandatory. For example, you can use 8.0.0c |
 
 ### CLUSTER section 
 | Parameter | Description |

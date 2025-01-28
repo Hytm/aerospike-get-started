@@ -1,12 +1,14 @@
 #GENERAL
-BACKEND="AWS" # AWS or DOCKER only supported
+BACKEND="DOCKER" # AWS or DOCKER only supported
 DESTROY_ON_CREATE="true"
-DURATION=12
+DURATION=4
 #Should always be between 1 and the initial size defined with CLUSTER_NUMBER_OF_NODES
 NODE_TO_STOP=3
+VERSION="8.0.0c" # specify a version to use. Mandatory for CE usage
 
 #CLUSTER
 CLUSTER_NAME="DEMO"
+#CLUSTER_INSTANCE_TYPE="i4g.4xlarge"
 CLUSTER_INSTANCE_TYPE="i4g.4xlarge"
 CLUSTER_NUMBER_OF_NODES=5
 #Lower configuration, use command 2 when running the benchme tool

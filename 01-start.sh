@@ -13,11 +13,16 @@ if [[ "$DESTROY_ON_CREATE" == "true" ]]; then
 fi
 
 #CLUSTER
+version_to_use=""
 # cluster instances creation
+if [[ "$VERSION" != "" ]]; then
+    version_to_use="-v ${VERSION}"
+fi
+
 if [[ "$BACKEND" ==  "AWS" ]]; then
     sed "s/@CLUSTER_NAME@/${CLUSTER_NAME}/g" configuration/aerospike.conf.tpl > configuration/aerospike.conf
 
-    aerolab cluster create -n ${CLUSTER_NAME} -c ${CLUSTER_NUMBER_OF_NODES} --instance-type=${CLUSTER_INSTANCE_TYPE} --start=n --aws-expire=${DURATION}h --customconf configuration/aerospike.conf
+    aerolab cluster create -n ${CLUSTER_NAME} -c ${CLUSTER_NUMBER_OF_NODES} --instance-type=${CLUSTER_INSTANCE_TYPE} --start=n --aws-expire=${DURATION}h --customconf configuration/aerospike.conf ${version_to_use}
 
     rm configuration/aerospike.conf
 
@@ -30,7 +35,7 @@ if [[ "$BACKEND" ==  "AWS" ]]; then
     # starting instances
     aerolab aerospike start -n ${CLUSTER_NAME} -l all
 else
-    aerolab cluster create -n ${CLUSTER_NAME} -c ${CLUSTER_NUMBER_OF_NODES}
+    aerolab cluster create -n ${CLUSTER_NAME} -c ${CLUSTER_NUMBER_OF_NODES} $version_to_use
 fi
 
 sleep 10
@@ -54,13 +59,20 @@ fi
 
 # preparing nodes
 aerolab files upload -c -n ${CLIENT_NAME} client/benchme /home/ubuntu/benchme
-seed=$(aerolab cluster list -i | head -1 | grep -E -o 'int_ip=.{0,15}' | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' )
 client_duration='3000 * DURATION'
-cmd="./benchme -H ${seed} -c 192 -m 100000000 -d $((client_duration)) -r 1 -s 3072 -u false"
-#cmd="./benchme -H ${seed} -c 12 -m 25000000 -d $((client_duration)) -r 1 -s 1024 -u false"
+if [[ "$BACKEND" ==  "AWS" ]]; then
+    seed=$(aerolab cluster list -i | head -1 | grep -E -o 'int_ip=.{0,15}' | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' )
+    grafana=$(aerolab client list -i | grep -A7 ${GRAFANA_NAME} | head -1 | grep -E -o 'ext_ip=.{0,15}' | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' )
+    cmd="./benchme -H ${seed} -c 192 -m 100000000 -d $((client_duration)) -r 1 -s 3072 -u false"
+else
+    seed=$(aerolab cluster list -i | head -1 | grep -E -o 'ext_ip=.{0,15}' | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' )
+    grafana="127.0.0.1"
+    #smaller configuration of benchme when running with Docker. the -D parameter is used to let benchme know is running in Docker
+    cmd="./benchme -H ${seed} -p 3100 -c 12 -m 2000000 -d $((client_duration)) -r 1 -s 1024 -u false -D true"
+fi
+
 echo $cmd
 
-grafana=$(aerolab client list -i | grep -A7 ${GRAFANA_NAME} | head -1 | grep -E -o 'ext_ip=.{0,15}' | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}' )
 
 aerolab client list
 
