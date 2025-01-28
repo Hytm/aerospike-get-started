@@ -168,7 +168,7 @@ To connect to the client, you need to pass the ssh key used by Aerolab. Here is 
 | -s --size | Size of records in bytes | 2048 |
 | -u --update | After MAX_KEYS is reached, update record or not | true |
 | -t --truncate | Will truncate the namespace before inserting new keys. | false |
-| -d --docker | If set to true, change the client behavior to ensure you can run on local machine. | false |
+| -D --docker | If set to true, change the client behavior to ensure you can run on local machine. | false |
 | -h --h | Print help |
 | -V --v | Print version |
 
