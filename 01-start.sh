@@ -76,6 +76,18 @@ echo $cmd
 
 aerolab client list
 
-echo "You can now visit http://${grafana}:3000"
+echo "You can now visit Grafana on http://${grafana}:3000"
+
+echo "Use the following credentials on Grafana:"
+echo "login is admin"
+echo "password is admin"
 
 echo "You can connect to client injector and use the command ${cmd}"
+
+if [[ "$BACKEND" ==  "DOCKER" ]]; then
+    echo "connect in the client container to run the client injector"
+    echo "docker exec -it aerolab_c-DEMO_CLIENT_1 /bin/bash"
+    echo "In the docker bash execute the following:"
+    echo "cd /home/ubuntu"
+    echo "${cmd}"
+fi
