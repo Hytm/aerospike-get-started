@@ -122,10 +122,14 @@ echo "You can now visit http://${grafana}:3000"
 aerolab client list
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 echo "You can now visit Grafana on http://${grafana}:3000"
 =======
 #aerolab client attach --name ${CLIENT_NAME} --node all --detach -- ${cmd}
 >>>>>>> 4a913bb (Add multi-az support)
+=======
+echo "You can now visit Grafana on http://${grafana}:3000"
+>>>>>>> b7d6ade (missed)
 
 echo "Use the following credentials on Grafana:"
 echo "login is admin"
